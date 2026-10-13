@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: orders-sync
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: SOURCE_URL
+        value: https://test.ooobs.ru/api/orders
