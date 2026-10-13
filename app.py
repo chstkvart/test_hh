@@ -7,11 +7,26 @@ import urllib.request
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-SOURCE_URL = os.environ.get("SOURCE_URL", "https://test.ooobs.ru/api/orders")
-PORT = int(os.environ.get("PORT", "8000"))
+
+def load_dotenv(path=".env"):
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("sync")
+
+SOURCE_URL = os.environ.get("SOURCE_URL")
+PORT = int(os.environ.get("PORT", "8000"))
 
 _lock = threading.Lock()
 _last_result = None
@@ -138,5 +153,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    if not SOURCE_URL:
+        raise SystemExit("SOURCE_URL is not set (env var or .env)")
     log.info("listening on :%s", PORT)
     ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
