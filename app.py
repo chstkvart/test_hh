@@ -126,7 +126,7 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0].rstrip("/") or "/"
         if path == "/health":
             return self._send(200, {"status": "ok"})
-        if path in ("/", "/clients", "/sync", "/api/clients"):
+        if path in ("/", "/result", "/clients", "/sync", "/api/clients"):
             try:
                 return self._send(200, run_sync())
             except Exception as e:
